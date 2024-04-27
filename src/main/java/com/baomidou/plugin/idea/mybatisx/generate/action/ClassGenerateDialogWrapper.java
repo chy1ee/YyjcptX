@@ -158,6 +158,7 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
         GenerateConfig generateConfig = new GenerateConfig();
         codeGenerateUI.refreshGenerateConfig(generateConfig);
         tablePreviewUI.refreshGenerateConfig(generateConfig);
+        columnChooseUI.refreshGenerateConfig(generateConfig);
         return generateConfig;
     }
 

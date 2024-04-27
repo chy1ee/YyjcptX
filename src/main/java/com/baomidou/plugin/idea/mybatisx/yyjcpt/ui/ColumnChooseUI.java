@@ -1,5 +1,7 @@
 package com.baomidou.plugin.idea.mybatisx.yyjcpt.ui;
 
+import com.baomidou.plugin.idea.mybatisx.generate.dto.GenerateConfig;
+import com.baomidou.plugin.idea.mybatisx.generate.dto.TableUIInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.helper.IntellijColumnInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.helper.IntellijTableInfo;
 import com.baomidou.plugin.idea.mybatisx.util.DbToolsUtils;
@@ -95,6 +97,7 @@ public class ColumnChooseUI {
                 info.setName(columnInfo.getName());
                 info.setDataType(columnInfo.getDataType());
                 info.setRemarks(columnInfo.getRemarks());
+                info.setNullable(true);
                 tableColumns.add(info);
                 dbTableColumnsModel.addRow(info);
             }
@@ -102,6 +105,31 @@ public class ColumnChooseUI {
         }
         else
             dbTableColumnsModel.addRows(tableColumns);
+    }
+
+    public void refreshGenerateConfig(GenerateConfig generateConfig) {
+        List<TableUIInfo> tableUIInfos = generateConfig.getTableUIInfoList();
+        for (TableUIInfo tableUIInfo : tableUIInfos) {
+            List<IntellijColumnInfo> parameterInfos = tableColumnsMap.get(tableUIInfo.getTableName());
+
+            List<IntellijColumnInfo> answer = new ArrayList<>();
+            if (parameterInfos != null) {
+                for (IntellijColumnInfo parameterInfo : parameterInfos) {
+                    if (parameterInfo.isSelected()) {
+                        IntellijColumnInfo temp = new IntellijColumnInfo();
+                        temp.setName(parameterInfo.getName());
+                        temp.setDataType(parameterInfo.getDataType());
+                        temp.setRemarks(parameterInfo.getRemarks());
+                        temp.setRequired(parameterInfo.isRequired());
+                        temp.setNullable(parameterInfo.getNullable());
+
+                        answer.add(temp);
+                    }
+                }
+            }
+
+            tableUIInfo.setParameterInfos(answer);
+        }
     }
 
     private static class TextTableColumnInfo extends ColumnInfo<IntellijColumnInfo, String> {
@@ -152,9 +180,9 @@ public class ColumnChooseUI {
         public Boolean valueOf(IntellijColumnInfo item) {
             Boolean answer = null;
             if ("required".equals(getName()))
-                answer = item.isGeneratedColumn();
+                answer = item.isRequired();
             else if ("selected".equals(getName()))
-                answer = item.isAutoIncrement();
+                answer = item.isSelected();
 
             return answer;
         }
@@ -170,13 +198,13 @@ public class ColumnChooseUI {
             checkBox.addChangeListener(e -> {
                 boolean value = checkBox.isSelected();
                 if ("required".equals(name)) {
-                    columnInfo.setGeneratedColumn(value);
-                    if (value && !columnInfo.isAutoIncrement())
-                        columnInfo.setAutoIncrement(true);
+                    columnInfo.setRequired(value);
+                    if (value && !columnInfo.isSelected())
+                        columnInfo.setSelected(true);
                 } else if ("selected".equals(name)) {
-                    columnInfo.setAutoIncrement(value);
-                    if (!value && columnInfo.isGeneratedColumn())
-                        columnInfo.setGeneratedColumn(false);
+                    columnInfo.setSelected(value);
+                    if (!value && columnInfo.isRequired())
+                        columnInfo.setRequired(false);
                 }
             });
         }

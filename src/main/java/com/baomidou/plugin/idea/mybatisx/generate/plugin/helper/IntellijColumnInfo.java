@@ -12,6 +12,8 @@ public class IntellijColumnInfo {
     private String columnDefaultValue;
     private Boolean nullable;
     private short keySeq;
+    private boolean selected;
+    private boolean required;
 
     public IntellijColumnInfo() {
     }
@@ -94,5 +96,21 @@ public class IntellijColumnInfo {
 
     public void setKeySeq(short keySeq) {
         this.keySeq = keySeq;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }

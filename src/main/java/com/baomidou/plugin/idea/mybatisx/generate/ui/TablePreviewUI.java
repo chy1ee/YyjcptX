@@ -58,6 +58,7 @@ public class TablePreviewUI {
     private JRadioButton camelRadioButton;
     private JRadioButton sameAsTablenameRadioButton;
     private JPanel classNameStrategyPanel;
+    private JTextField vueSrcPathTextField;
     private PsiElement[] tableElements;
     private List<DbTable> dbTables;
 
@@ -93,8 +94,10 @@ public class TablePreviewUI {
         domainInfo.setBasePackage(basePackageTextField.getText());
         domainInfo.setRelativePackage(relativePackageTextField.getText());
         domainInfo.setEncoding(encodingTextField.getText());
+        domainInfo.setVueSrcPath(vueSrcPathTextField.getText());
         // 放一个自己名字的引用
         domainInfo.setFileName("${domain.fileName}");
+        domainInfo.setTableName("${domain.tableName}");
         return domainInfo;
 
     }
@@ -123,6 +126,7 @@ public class TablePreviewUI {
         basePathTextField.setText(generateConfig.getBasePath());
         relativePackageTextField.setText(generateConfig.getRelativePackage());
         extraClassSuffixTextField.setText(generateConfig.getExtraClassSuffix());
+        vueSrcPathTextField.setText(generateConfig.getVueSrcPath());
         moduleName = generateConfig.getModuleName();
 
         if (!StringUtils.isEmpty(moduleName)) {
@@ -251,6 +255,7 @@ public class TablePreviewUI {
         generateConfig.setModuleName(moduleName);
         generateConfig.setExtraClassSuffix(extraClassSuffixTextField.getText());
         generateConfig.setClassNameStrategy(findClassNameStrategy());
+        generateConfig.setVueSrcPath(vueSrcPathTextField.getText());
         // 保存对象, 用于传递和对象生成
         generateConfig.setTableUIInfoList(model.getItems());
     }

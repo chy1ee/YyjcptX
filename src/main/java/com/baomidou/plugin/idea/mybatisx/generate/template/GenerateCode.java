@@ -4,10 +4,12 @@ import com.baomidou.plugin.idea.mybatisx.generate.dto.CustomTemplateRoot;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.DomainInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.GenerateConfig;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.ModuleInfoGo;
+import com.baomidou.plugin.idea.mybatisx.generate.dto.TableUIInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.TemplateSettingDTO;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.DaoEntityAnnotationInterfacePlugin;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.IntellijMyBatisGenerator;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.JavaTypeResolverJsr310Impl;
+import com.baomidou.plugin.idea.mybatisx.generate.plugin.helper.IntellijColumnInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.helper.IntellijTableInfo;
 import com.baomidou.plugin.idea.mybatisx.generate.plugin.helper.MergeJavaCallBack;
 import com.baomidou.plugin.idea.mybatisx.generate.util.DomainPlaceHolder;
@@ -67,6 +69,30 @@ public class GenerateCode {
                                 DbTable dbTable,
                                 String domainName,
                                 String tableName) throws Exception {
+        IntellijTableInfo intellijTableInfo = DbToolsUtils.buildIntellijTableInfo(dbTable);
+
+        List<IntellijColumnInfo> parameterInfos = null;
+        for (TableUIInfo tableUIInfo : generateConfig.getTableUIInfoList()) {
+            if (tableName.equals(tableUIInfo.getTableName())) {
+                parameterInfos = tableUIInfo.getParameterInfos();
+                break;
+            }
+        }
+
+        if (parameterInfos == null)
+            parameterInfos = new ArrayList<>();
+
+        intellijTableInfo.setParameterInfos(parameterInfos);
+
+        generate(project, generateConfig, templateSettingMap, domainName, tableName, intellijTableInfo);
+    }
+
+    public static void generate(Project project,
+                                GenerateConfig generateConfig,
+                                Map<String, List<TemplateSettingDTO>> templateSettingMap,
+                                String domainName,
+                                String tableName,
+                                IntellijTableInfo intellijTableInfo) throws Exception {
         List<String> warnings = new ArrayList<>();
         Configuration config = new Configuration();
 
@@ -132,12 +158,9 @@ public class GenerateCode {
         addPluginConfiguration(context, generateConfig);
         config.addContext(context);
 
-
-        IntellijTableInfo intellijTableInfo = DbToolsUtils.buildIntellijTableInfo(dbTable);
         Set<String> contexts = new HashSet<>();
         Set<String> fullyqualifiedTables = new HashSet<>();
         IntellijMyBatisGenerator intellijMyBatisGenerator = new IntellijMyBatisGenerator(config, SHELL_CALLBACK, warnings);
-
 
         intellijMyBatisGenerator.generate(new NullProgressCallback(), contexts, fullyqualifiedTables, true, classLoaderList, intellijTableInfo);
     }
@@ -150,6 +173,8 @@ public class GenerateCode {
         domainInfo.setRelativePackage(generateConfig.getRelativePackage());
         domainInfo.setEncoding(generateConfig.getEncoding());
         domainInfo.setFileName(domainName);
+        domainInfo.setVueSrcPath(generateConfig.getVueSrcPath());
+        domainInfo.setTableName(StringUtils.lowerCaseFirstChar(domainName));
         return domainInfo;
     }
 
@@ -233,6 +258,7 @@ public class GenerateCode {
         moduleUIInfo.setFileName(DomainPlaceHolder.replace(moduleInfo.getFileName(), domainInfo));
         moduleUIInfo.setFileNameWithSuffix(DomainPlaceHolder.replace(moduleInfo.getFileNameWithSuffix(), domainInfo));
         moduleUIInfo.setEncoding(DomainPlaceHolder.replace(moduleInfo.getEncoding(), domainInfo));
+        moduleUIInfo.setBasePackage(domainInfo.getBasePackage());
         return moduleUIInfo;
     }
 

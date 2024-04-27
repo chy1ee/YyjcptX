@@ -1,6 +1,9 @@
 package com.baomidou.plugin.idea.mybatisx.generate.template;
 
 import com.baomidou.plugin.idea.mybatisx.generate.dto.FieldInfo;
+import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
+import com.baomidou.plugin.idea.mybatisx.yyjcpt.constant.ConstantUtils;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 
@@ -54,6 +57,12 @@ public class ClassInfo {
      * 需要导入的实体类的所有字段类型
      */
     private List<String> importList;
+    /**
+     * 查询参数字段类型
+     */
+    private List<FieldInfo> parameterFields;
+
+    private String shortClassName2;
 
     public static ClassInfo build(IntrospectedTable introspectedTable) {
         ClassInfo classInfo = new ClassInfo();
@@ -62,6 +71,7 @@ public class ClassInfo {
         classInfo.shortClassName = type.getShortName();
         classInfo.tableName = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         classInfo.remark = introspectedTable.getRemarks() == null ? "" : introspectedTable.getRemarks();
+        classInfo.shortClassName2 = StringUtils.lowerCaseFirstChar(classInfo.shortClassName);
 
         classInfo.pkFields = introspectedTable.getPrimaryKeyColumns()
                 .stream()
@@ -84,6 +94,7 @@ public class ClassInfo {
             .flatMap(Collection::stream)
             .map(FieldInfo::build)
             .collect(Collectors.toList());
+
         // 拿到所有需要import的类型, 不是java.lang包开头的,并且不是数组类型 去重的所有类型
         classInfo.importList = classInfo.allFields.stream()
             .filter(fieldInfo -> !fieldInfo.isColumnIsArray())
@@ -91,6 +102,12 @@ public class ClassInfo {
             .filter(typeName->!typeName.startsWith("java.lang"))
             .distinct()
             .collect(Collectors.toList());
+
+        classInfo.parameterFields = ((List<IntrospectedColumn>)introspectedTable.getAttribute(ConstantUtils.YYJCPT_PARAMETER_INFOS))
+            .stream()
+            .map(FieldInfo::build)
+            .collect(Collectors.toList());
+
         return classInfo;
     }
 
@@ -124,5 +141,13 @@ public class ClassInfo {
 
     public List<String> getImportList() {
         return importList;
+    }
+
+    public List<FieldInfo> getParameterFields() {
+        return parameterFields;
+    }
+
+    public String getShortClassName2() {
+        return shortClassName2;
     }
 }

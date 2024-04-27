@@ -40,6 +40,8 @@ public class ModuleInfoGo implements Serializable {
      */
     private String basePath;
 
+    private String basePackage;
+
     public String getFileNameWithSuffix() {
         return fileNameWithSuffix;
     }
@@ -94,5 +96,13 @@ public class ModuleInfoGo implements Serializable {
 
     public void setBasePath(String basePath) {
         this.basePath = basePath;
+    }
+
+    public String getBasePackage() {
+        return basePackage;
+    }
+
+    public void setBasePackage(String basePackage) {
+        this.basePackage = basePackage;
     }
 }

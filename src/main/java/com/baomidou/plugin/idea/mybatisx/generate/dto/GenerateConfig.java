@@ -101,6 +101,8 @@ public class GenerateConfig {
      */
     private String classNameStrategy;
 
+    private String vueSrcPath;
+
     public List<TableUIInfo> getTableUIInfoList() {
         return tableUIInfoList;
     }
@@ -330,5 +332,13 @@ public class GenerateConfig {
 
     public void setClassNameStrategy(String classNameStrategy) {
         this.classNameStrategy = classNameStrategy;
+    }
+
+    public String getVueSrcPath() {
+        return vueSrcPath;
+    }
+
+    public void setVueSrcPath(String vueSrcPath) {
+        this.vueSrcPath = vueSrcPath;
     }
 }

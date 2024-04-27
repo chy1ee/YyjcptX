@@ -7,8 +7,10 @@ public class DomainInfo implements Serializable {
     private String basePackage;
     private String relativePackage;
     private String fileName;
+    private String tableName;
     private String basePath;
     private String modulePath;
+    private String vueSrcPath;
 
     public String getModulePath() {
         return modulePath;
@@ -50,12 +52,28 @@ public class DomainInfo implements Serializable {
         this.fileName = fileName;
     }
 
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
     public String getRelativePackage() {
         return relativePackage;
     }
 
     public void setRelativePackage(String relativePackage) {
         this.relativePackage = relativePackage;
+    }
+
+    public String getVueSrcPath() {
+        return vueSrcPath;
+    }
+
+    public void setVueSrcPath(String vueSrcPath) {
+        this.vueSrcPath = vueSrcPath;
     }
 
     public DomainInfo copyFromFileName(String extraDomainName) {
@@ -66,6 +84,8 @@ public class DomainInfo implements Serializable {
         domainInfo.setBasePackage(basePackage);
         domainInfo.setFileName(extraDomainName);
         domainInfo.setRelativePackage(relativePackage);
+        domainInfo.setVueSrcPath(vueSrcPath);
+        domainInfo.setTableName(tableName);
         return domainInfo;
     }
 }

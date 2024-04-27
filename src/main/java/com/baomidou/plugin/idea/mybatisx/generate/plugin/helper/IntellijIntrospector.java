@@ -1,6 +1,7 @@
 package com.baomidou.plugin.idea.mybatisx.generate.plugin.helper;
 
 
+import com.baomidou.plugin.idea.mybatisx.yyjcpt.constant.ConstantUtils;
 import org.mybatis.generator.api.FullyQualifiedTable;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -333,6 +334,14 @@ public class IntellijIntrospector {
     }
 
     private Map<ActualTableName, List<IntrospectedColumn>> getColumns(TableConfiguration tc) throws SQLException {
+        return getColumns(tc, this.intellijTableInfo.getColumnInfos());
+    }
+
+    private Map<ActualTableName, List<IntrospectedColumn>> getParameters(TableConfiguration tc) throws SQLException {
+        return getColumns(tc, this.intellijTableInfo.getParameterInfos());
+    }
+
+    private Map<ActualTableName, List<IntrospectedColumn>> getColumns(TableConfiguration tc, List<IntellijColumnInfo> columnInfos) throws SQLException {
         boolean delimitIdentifiers = tc.isDelimitIdentifiers() || StringUtility.stringContainsSpace(tc.getCatalog()) || StringUtility.stringContainsSpace(tc.getSchema()) || StringUtility.stringContainsSpace(tc.getTableName());
         String localCatalog;
         String localSchema;
@@ -355,7 +364,7 @@ public class IntellijIntrospector {
 
         boolean supportsIsAutoIncrement = false;
         boolean supportsIsGeneratedColumn = false;
-        Iterator var9 = this.intellijTableInfo.getColumnInfos().iterator();
+        Iterator var9 = columnInfos.iterator();
 
         IntellijColumnInfo intellijColumnInfo;
         while (var9.hasNext()) {
@@ -369,7 +378,7 @@ public class IntellijIntrospector {
             }
         }
 
-        var9 = this.intellijTableInfo.getColumnInfos().iterator();
+        var9 = columnInfos.iterator();
 
         while (var9.hasNext()) {
             intellijColumnInfo = (IntellijColumnInfo) var9.next();
@@ -378,7 +387,7 @@ public class IntellijIntrospector {
             introspectedColumn.setJdbcType(intellijColumnInfo.getDataType());
             introspectedColumn.setLength(intellijColumnInfo.getSize());
             introspectedColumn.setActualColumnName(intellijColumnInfo.getName());
-            introspectedColumn.setNullable(intellijColumnInfo.getNullable());
+            introspectedColumn.setNullable(!intellijColumnInfo.isRequired() && intellijColumnInfo.getNullable());
             introspectedColumn.setScale(intellijColumnInfo.getDecimalDigits());
             introspectedColumn.setRemarks(intellijColumnInfo.getRemarks());
             introspectedColumn.setDefaultValue(intellijColumnInfo.getColumnDefaultValue());
@@ -424,7 +433,8 @@ public class IntellijIntrospector {
         return answer;
     }
 
-    private List<IntrospectedTable> calculateIntrospectedTables(TableConfiguration tc, Map<ActualTableName, List<IntrospectedColumn>> columns) {
+    private List<IntrospectedTable> calculateIntrospectedTables(TableConfiguration tc, Map<ActualTableName, List<IntrospectedColumn>> columns)
+            throws SQLException {
         boolean delimitIdentifiers = tc.isDelimitIdentifiers() || StringUtility.stringContainsSpace(tc.getCatalog()) || StringUtility.stringContainsSpace(tc.getSchema()) || StringUtility.stringContainsSpace(tc.getTableName());
         List<IntrospectedTable> answer = new ArrayList();
         Iterator var5 = columns.entrySet().iterator();
@@ -443,10 +453,31 @@ public class IntellijIntrospector {
 
             this.calculatePrimaryKey(table, introspectedTable);
             this.enhanceIntrospectedTable(introspectedTable);
+
+            calculateIntrospectedParameter(tc, introspectedTable);
+
             answer.add(introspectedTable);
         }
 
         return answer;
+    }
+
+    private void calculateIntrospectedParameter(TableConfiguration tc, IntrospectedTable introspectedTable) throws SQLException {
+        if (tc.getTableName().equals(this.intellijTableInfo.getTableName())) {
+            Map<ActualTableName, List<IntrospectedColumn>> parameters = getParameters(tc);
+
+            this.removeIgnoredColumns(tc, parameters);
+            this.calculateExtraColumnInformation(tc, parameters);
+            this.applyColumnOverrides(tc, parameters);
+
+            Iterator var5 = parameters.entrySet().iterator();
+            while (var5.hasNext()) {
+                Entry<ActualTableName, List<IntrospectedColumn>> entry = (Entry) var5.next();
+                if (tc.getTableName().equals(entry.getKey().getTableName())) {
+                    introspectedTable.setAttribute(ConstantUtils.YYJCPT_PARAMETER_INFOS, entry.getValue());
+                }
+            }
+        }
     }
 
     private void enhanceIntrospectedTable(IntrospectedTable introspectedTable) {

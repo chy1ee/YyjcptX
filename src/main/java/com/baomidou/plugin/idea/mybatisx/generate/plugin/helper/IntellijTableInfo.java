@@ -9,6 +9,7 @@ public class IntellijTableInfo {
     private String tableRemark;
     private String tableType;
     private List<IntellijColumnInfo> columnInfos;
+    private List<IntellijColumnInfo> parameterInfos;
     private List<IntellijColumnInfo> primaryKeyColumns;
 
     public IntellijTableInfo() {
@@ -36,6 +37,14 @@ public class IntellijTableInfo {
 
     public void setColumnInfos(List<IntellijColumnInfo> columnInfos) {
         this.columnInfos = columnInfos;
+    }
+
+    public List<IntellijColumnInfo> getParameterInfos() {
+        return parameterInfos;
+    }
+
+    public void setParameterInfos(List<IntellijColumnInfo> parameterInfos) {
+        this.parameterInfos = parameterInfos;
     }
 
     public List<IntellijColumnInfo> getPrimaryKeyColumns() {

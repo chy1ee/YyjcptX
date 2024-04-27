@@ -69,4 +69,9 @@ public class DefaultGenerateConfig extends GenerateConfig {
     public String getClassNameStrategy() {
         return ClassNameStrategy.ClassNameStrategyEnum.CAMEL.name();
     }
+
+    @Override
+    public String getVueSrcPath() {
+        return "../yyjcpt-web/src";
+    }
 }

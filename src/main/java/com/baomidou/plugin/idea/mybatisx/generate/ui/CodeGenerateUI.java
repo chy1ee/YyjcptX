@@ -37,6 +37,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -172,7 +173,7 @@ public class CodeGenerateUI {
             })
             .disableAddAction()
             .disableUpDownActions()
-            .setPreferredSize(new Dimension(840, 150))
+            .setPreferredSize(new Dimension(840, 220))
             .createPanel(), gridConstraints);
 
         initRaidoLayout(templateSettingMap);
@@ -220,6 +221,7 @@ public class CodeGenerateUI {
                 if (list == null) {
                     list = templateSettingMap.values().iterator().next();
                 }
+                list.sort(Comparator.comparing(TemplateSettingDTO::getBasePath));
                 return list;
             }
 
@@ -338,6 +340,8 @@ public class CodeGenerateUI {
      * @param modulePath
      */
     private void initSelectedModuleTable(List<TemplateSettingDTO> list, String modulePath) {
+        list.sort(Comparator.comparing(TemplateSettingDTO::getBasePath));
+
         // 扩展面板的列表内容
         // 移除所有行, 重新刷新
         for (int rowCount = model.getRowCount(); rowCount > 0; rowCount--) {
