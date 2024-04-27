@@ -40,7 +40,7 @@ intellij {
         "SpringBoot",
         "DatabaseTools") //Bundled plugin dependencies
 
-    pluginName = "MybatisX"
+    pluginName = "YyjcptX"
     sandboxDirectory = "${rootProject.rootDir}/idea-sandbox"
 
     updateSinceUntilBuild = false
@@ -55,8 +55,8 @@ intellij {
 // 各种版本去这里找
 // https://www.jetbrains.com/intellij-repository/releases
 
-group="com.baomidou.plugin.idea.mybatisx"
-version="1.5.2"
+group="com.baomidou.plugin.idea.mybatisx.yyjcpt"
+version="1.5.2a"
 
 repositories {
     mavenLocal()
@@ -70,8 +70,8 @@ dependencies {
     implementation("org.mybatis.generator:mybatis-generator-core:1.4.0")
     implementation("org.freemarker:freemarker:2.3.29")
     implementation("com.itranswarp:compiler:1.0")
-    testCompile("junit:junit:4.12")
-    testCompile("commons-io:commons-io:2.8.0")
+    testImplementation("junit:junit:4.12")
+    testImplementation("commons-io:commons-io:2.8.0")
     compileOnly("org.projectlombok:lombok:1.18.0")
 }
 

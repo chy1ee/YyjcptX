@@ -31,7 +31,7 @@ public class DefaultSettingsConfig {
     public static final String TEMPLATES = "templates";
 
     private static File getPath(@NotNull String pathParam) throws IOException {
-        @NotNull PluginId id = Objects.requireNonNull(PluginId.findId("com.baomidou.plugin.idea.mybatisx"));
+        @NotNull PluginId id = Objects.requireNonNull(PluginId.findId("com.baomidou.plugin.idea.mybatisx.yyjcpt"));
         final ScratchFileService scratchFileService = ScratchFileService.getInstance();
         final ExtensionsRootType extensionsRootType = ExtensionsRootType.getInstance();
         final String path = scratchFileService.getRootPath(extensionsRootType) + "/" + id.getIdString() +

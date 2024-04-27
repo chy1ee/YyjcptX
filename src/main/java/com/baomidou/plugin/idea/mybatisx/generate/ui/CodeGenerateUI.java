@@ -147,9 +147,6 @@ public class CodeGenerateUI {
     private void initTemplates(GenerateConfig generateConfig,
                                String defaultsTemplatesName,
                                Map<String, List<TemplateSettingDTO>> templateSettingMap) {
-        if (selectedTemplateName == null) {
-            selectedTemplateName = generateConfig.getTemplatesName();
-        }
         TableView<ModuleInfoGo> tableView = new TableView<>(model);
 
         GridConstraints gridConstraints = new GridConstraints();
@@ -250,6 +247,23 @@ public class CodeGenerateUI {
             final JRadioButton radioButton = (JRadioButton) radios.nextElement();
             radioButton.addItemListener(itemListener);
         }
+
+        // 修复第一次点击为NULL的BUG -- chylee
+        if (selectedTemplateName == null) {
+            selectedTemplateName = generateConfig.getTemplatesName();
+        }
+
+        if (selectedTemplateName == null) {
+            final Enumeration<AbstractButton> elements = templateButtonGroup.getElements();
+            if (elements.hasMoreElements()) {
+                final AbstractButton abstractButton = elements.nextElement();
+                selectedTemplateName = abstractButton.getText();
+            }
+        }
+
+        if (selectedTemplateName == null)
+            return;
+
         final List<TemplateSettingDTO> list = templateSettingMap.get(selectedTemplateName);
         selectDefaultTemplateRadio(list);
 

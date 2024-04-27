@@ -51,7 +51,7 @@ public class DefaultGenerateConfig extends GenerateConfig {
 
     @Override
     public String getRelativePackage() {
-        return "domain";
+        return "model";
     }
 
     @Override

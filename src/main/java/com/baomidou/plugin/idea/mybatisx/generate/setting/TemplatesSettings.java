@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@State(name = "TemplatesSettings", storages = {@Storage("mybatisx/templates.xml")})
+@State(name = "TemplatesSettings", storages = {@Storage("yyjcptx/templates.xml")})
 public class TemplatesSettings implements PersistentStateComponent<TemplatesSettings> {
 
     private TemplateContext templateConfigs;

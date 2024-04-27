@@ -9,6 +9,7 @@ import com.baomidou.plugin.idea.mybatisx.generate.setting.TemplatesSettings;
 import com.baomidou.plugin.idea.mybatisx.generate.ui.CodeGenerateUI;
 import com.baomidou.plugin.idea.mybatisx.generate.ui.TablePreviewUI;
 import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
+import com.baomidou.plugin.idea.mybatisx.yyjcpt.ui.ColumnChooseUI;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -31,6 +32,8 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
 
     private TablePreviewUI tablePreviewUI = new TablePreviewUI();
 
+    private ColumnChooseUI columnChooseUI = new ColumnChooseUI();
+
     private JPanel rootPanel = new JPanel();
 
     private java.util.List<JPanel> containerPanelList;
@@ -38,7 +41,7 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
     private Action previousAction;
 
     private int page = 0;
-    private int lastPage = 1;
+    private int lastPage = 2;
     private Project project;
     private List<DbTable> tableElements;
 
@@ -53,8 +56,10 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
             protected void doAction(ActionEvent e) {
                 page = page - 1;
                 switchPage(page);
-                previousAction.setEnabled(false);
-                setOKButtonText("Next");
+                if (page == 1)
+                    setOKButtonText("Next");
+                else if (page == 0)
+                    previousAction.setEnabled(false);
             }
         };
         // 默认禁用 上一个设置
@@ -63,6 +68,7 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
         java.util.List<JPanel> list = new ArrayList<>();
         list.add(tablePreviewUI.getRootPanel());
         list.add(codeGenerateUI.getRootPanel());
+        list.add(columnChooseUI.getRootPanel());
         containerPanelList = list;
         // 默认切换到第一页
         switchPage(0);
@@ -76,29 +82,36 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
             super.doOKAction();
             return;
         }
-        // 替换第二个panel的占位符
-        DomainInfo domainInfo = tablePreviewUI.buildDomainInfo();
-        if (StringUtils.isEmpty(domainInfo.getModulePath())) {
-            Messages.showMessageDialog("Please select module to generate files", "Generate File", Messages.getWarningIcon());
-            return;
+
+        if (page == 0) {
+            // 替换第二个panel的占位符
+            DomainInfo domainInfo = tablePreviewUI.buildDomainInfo();
+            if (StringUtils.isEmpty(domainInfo.getModulePath())) {
+                Messages.showMessageDialog("Please select module to generate files", "Generate File", Messages.getWarningIcon());
+                return;
+            }
+            previousAction.setEnabled(true);
+
+            TemplatesSettings templatesSettings = TemplatesSettings.getInstance(project);
+            final TemplateContext templateContext = templatesSettings.getTemplateConfigs();
+            final Map<String, List<TemplateSettingDTO>> settingMap = templatesSettings.getTemplateSettingMap();
+            if (settingMap.isEmpty()) {
+                throw new RuntimeException("无法获取模板");
+            }
+
+            codeGenerateUI.fillData(project,
+                generateConfig,
+                domainInfo,
+                templateContext.getTemplateName(),
+                settingMap);
         }
+        else if (page == 1) {
+            columnChooseUI.fillData(tableElements);
+            setOKButtonText("Finish");
+        }
+
         page = page + 1;
-        setOKButtonText("Finish");
-        previousAction.setEnabled(true);
-
-        TemplatesSettings templatesSettings = TemplatesSettings.getInstance(project);
-        final TemplateContext templateContext = templatesSettings.getTemplateConfigs();
-        final Map<String, List<TemplateSettingDTO>> settingMap = templatesSettings.getTemplateSettingMap();
-        if (settingMap.isEmpty()) {
-            throw new RuntimeException("无法获取模板");
-        }
-        codeGenerateUI.fillData(project,
-            generateConfig,
-            domainInfo,
-            templateContext.getTemplateName(),
-            settingMap);
         switchPage(page);
-
     }
 
 
@@ -139,7 +152,6 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
         }
 
         tablePreviewUI.fillData(project, tableElements, generateConfig);
-
     }
 
     public GenerateConfig determineGenerateConfig() {
