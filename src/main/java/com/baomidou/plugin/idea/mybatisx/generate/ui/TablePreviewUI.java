@@ -86,7 +86,6 @@ public class TablePreviewUI {
 
     }
 
-
     public DomainInfo buildDomainInfo() {
         DomainInfo domainInfo = new DomainInfo();
         domainInfo.setModulePath(moduleChooseTextField.getText());

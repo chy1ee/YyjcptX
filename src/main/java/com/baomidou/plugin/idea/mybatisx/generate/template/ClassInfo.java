@@ -7,6 +7,7 @@ import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,10 +104,10 @@ public class ClassInfo {
             .distinct()
             .collect(Collectors.toList());
 
-        classInfo.parameterFields = ((List<IntrospectedColumn>)introspectedTable.getAttribute(ConstantUtils.YYJCPT_PARAMETER_INFOS))
-            .stream()
-            .map(FieldInfo::build)
-            .collect(Collectors.toList());
+        List<IntrospectedColumn> parameterList = (List<IntrospectedColumn>)introspectedTable.getAttribute(ConstantUtils.YYJCPT_PARAMETER_INFOS);
+        classInfo.parameterFields = parameterList == null
+            ? new ArrayList<>()
+            :  parameterList.stream().map(FieldInfo::build).collect(Collectors.toList());
 
         return classInfo;
     }

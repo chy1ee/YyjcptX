@@ -27,7 +27,7 @@ public class ${baseInfo.fileName} {
     * 列表
     */
     @PostMapping("page")
-    public Response<?> list(@RequestBody ${tableClass.shortClassName}QO qo){
+    public Response<?> list(@RequestBody @Validated ${tableClass.shortClassName}QO qo){
         return Response.successData(${tableClass.shortClassName2}Service.page${tableClass.shortClassName}(qo));
     }
 

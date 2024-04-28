@@ -9,6 +9,7 @@ import com.baomidou.plugin.idea.mybatisx.generate.setting.TemplatesSettings;
 import com.baomidou.plugin.idea.mybatisx.generate.ui.CodeGenerateUI;
 import com.baomidou.plugin.idea.mybatisx.generate.ui.TablePreviewUI;
 import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
+import com.baomidou.plugin.idea.mybatisx.yyjcpt.GenerateDialogCallback;
 import com.baomidou.plugin.idea.mybatisx.yyjcpt.ui.ColumnChooseUI;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.project.Project;
@@ -28,7 +29,7 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassGenerateDialogWrapper.class);
 
-    private CodeGenerateUI codeGenerateUI = new CodeGenerateUI();
+    private CodeGenerateUI codeGenerateUI;
 
     private TablePreviewUI tablePreviewUI = new TablePreviewUI();
 
@@ -45,11 +46,16 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
     private Project project;
     private List<DbTable> tableElements;
 
+    private GenerateDialogCallback dialogCallback;
+
     protected ClassGenerateDialogWrapper(@Nullable Project project) {
         super(project);
         this.setTitle("Generate Options");
         setOKButtonText("Next");
         setCancelButtonText("Cancel");
+
+        dialogCallback = new GenerateDialogCallback(getOKAction());
+        codeGenerateUI = new CodeGenerateUI(dialogCallback);
 
         previousAction = new DialogWrapperAction("Previous") {
             @Override
@@ -106,8 +112,12 @@ public class ClassGenerateDialogWrapper extends DialogWrapper {
                 settingMap);
         }
         else if (page == 1) {
-            columnChooseUI.fillData(tableElements);
-            setOKButtonText("Finish");
+            if (dialogCallback.isLastStep())
+                super.doOKAction();
+            else {
+                columnChooseUI.fillData(tableElements);
+                setOKButtonText("Finish");
+            }
         }
 
         page = page + 1;

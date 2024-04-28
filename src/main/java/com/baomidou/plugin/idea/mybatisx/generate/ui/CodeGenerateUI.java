@@ -7,6 +7,7 @@ import com.baomidou.plugin.idea.mybatisx.generate.dto.TemplateAnnotationType;
 import com.baomidou.plugin.idea.mybatisx.generate.dto.TemplateSettingDTO;
 import com.baomidou.plugin.idea.mybatisx.generate.util.DomainPlaceHolder;
 import com.baomidou.plugin.idea.mybatisx.util.StringUtils;
+import com.baomidou.plugin.idea.mybatisx.yyjcpt.GenerateDialogCallback;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -73,6 +74,11 @@ public class CodeGenerateUI {
     private Project project;
     private DomainInfo domainInfo;
     private String selectedTemplateName;
+
+    private GenerateDialogCallback generateDialogCallback;
+    public CodeGenerateUI(GenerateDialogCallback callback) {
+        this.generateDialogCallback = callback;
+    }
 
     public JPanel getRootPanel() {
         return rootPanel;
@@ -192,6 +198,8 @@ public class CodeGenerateUI {
                 List<ModuleInfoGo> moduleUIInfoList = buildModuleUIInfos(templatesName, list);
                 initMemoryModuleTable(moduleUIInfoList);
                 selectedTemplateName = jRadioButton.getText();
+
+                generateDialogCallback.updateStepStatus(!selectedTemplateName.startsWith("yyjcpt-"));
             }
 
             private List<ModuleInfoGo> buildModuleUIInfos(String templatesName, List<TemplateSettingDTO> list) {
